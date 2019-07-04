@@ -8,7 +8,7 @@ import (
 
 type Buffer struct {
 	file *os.File
-	buf  *bytes.Buffer
+	buf  bytes.Buffer
 }
 
 type CommonInterface interface {
@@ -49,13 +49,17 @@ func (b *Buffer) Read(p []byte) (n int, err error) {
 }
 
 func New(toDisk bool) *Buffer {
-	file, err := ioutil.TempFile("", "ramdiskbuffer")
-	if err != nil {
-		panic(err)
+	if toDisk {
+		file, err := ioutil.TempFile("", "ramdiskbuffer")
+		if err != nil {
+			panic(err)
+		}
+		return &Buffer{
+			file: file,
+		}
 	}
-	return &Buffer{
-		file: file,
-	}
+
+	return &Buffer{}
 }
 
 func (d *Buffer) Remove() error {
