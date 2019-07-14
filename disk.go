@@ -15,6 +15,12 @@ type CommonInterface interface {
 	Write(p []byte) (n int, err error)
 	WriteString(s string) (n int, err error)
 	Read(p []byte) (n int, err error)
+
+	Len() int
+	Close() error
+
+	LenInt64() int64
+	Remove() error
 }
 
 // Write appends the contents of p to the buffer, growing the buffer as
@@ -64,10 +70,39 @@ func New(toDisk bool) *Buffer {
 
 func (d *Buffer) Remove() error {
 	if d.file != nil {
+		d.file.Close()
 		return os.Remove(d.file.Name())
 	}
 	// TODO: better remove buffer
 	d.buf.Reset()
+	return nil
+}
+func (d *Buffer) Len() int {
+	if d.file != nil {
+		err := d.file.Sync()
+		if err != nil {
+			// TODO: not panic??
+			panic(err)
+		}
+
+		info, err := d.file.Stat()
+		// TODO: consider error?
+		_ = err
+		return int(info.Size())
+	}
+	return d.buf.Len()
+}
+func (d *Buffer) LenInt64() int64 {
+	return int64(d.Len())
+}
+func (d *Buffer) Close() error {
+	if d.file != nil {
+		err := d.file.Sync()
+		if err != nil {
+			return err
+		}
+		return d.file.Close()
+	}
 	return nil
 }
 func (d *Buffer) PrepareForReading() error {
