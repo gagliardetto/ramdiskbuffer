@@ -86,8 +86,10 @@ func (d *Buffer) Len() int {
 		}
 
 		info, err := d.file.Stat()
-		// TODO: consider error?
-		_ = err
+		if err != nil {
+			// TODO: not panic??
+			panic(err)
+		}
 		return int(info.Size())
 	}
 	return d.buf.Len()
