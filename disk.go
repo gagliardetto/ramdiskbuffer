@@ -149,6 +149,7 @@ func (ba BufferArray) Remove() error {
 		// remove
 		err := buf.Remove()
 		if err != nil {
+			// TODO: return error, or make an error array and return at the end?
 			return err
 		}
 	}
