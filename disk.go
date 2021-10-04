@@ -64,7 +64,6 @@ func New(toDisk bool) *Buffer {
 			file: file,
 		}
 	}
-
 	return &Buffer{}
 }
 
@@ -77,7 +76,8 @@ func (d *Buffer) Remove() error {
 	d.buf.Reset()
 	return nil
 }
-func (d *Buffer) Len() int {
+
+func (d *Buffer) Size() int {
 	if d.file != nil {
 		err := d.file.Sync()
 		if err != nil {
@@ -94,9 +94,11 @@ func (d *Buffer) Len() int {
 	}
 	return d.buf.Len()
 }
-func (d *Buffer) LenInt64() int64 {
-	return int64(d.Len())
+
+func (d *Buffer) SizeInt64() int64 {
+	return int64(d.Size())
 }
+
 func (d *Buffer) Close() error {
 	if d.file != nil {
 		err := d.file.Sync()
@@ -107,6 +109,7 @@ func (d *Buffer) Close() error {
 	}
 	return nil
 }
+
 func (d *Buffer) PrepareForReading() error {
 	if d.file != nil {
 		err := d.file.Sync()
@@ -144,6 +147,7 @@ func (ba BufferArray) PrepareForReading() error {
 	}
 	return nil
 }
+
 func (ba BufferArray) Remove() error {
 	for _, buf := range ba {
 		// remove
